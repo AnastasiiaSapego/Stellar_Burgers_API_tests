@@ -1,7 +1,7 @@
-// src/test/java/ru/praktikum/tests/orders/OrderCreationTests.java
 package ru.praktikum.tests.orders;
 
 import io.qameta.allure.*;
+import io.qameta.allure.junit4.DisplayName;
 import org.junit.Before;
 import org.junit.Test;
 import ru.praktikum.base.BaseTest;
@@ -24,6 +24,7 @@ public class OrderCreationTests extends BaseTest {
     private UserClient userClient;
     private AssertionsHelper asserts;
     private DataFactory data;
+    private static final String INVALID_HASH = "InvalidHash123";
 
     private List<String> validIngredientIds;
 
@@ -46,38 +47,43 @@ public class OrderCreationTests extends BaseTest {
     }
 
     @Test
-    @Story("Создание заказа с авторизацией")
-    public void createOrder_authorized_success() {
+    @DisplayName("Создать заказ с авторизацией и валидными ингредиентами")
+    @Description("Позитив: передаём 2 валидных ингредиента и токен. Ожидаем 200 и номер заказа.")
+    public void createOrderAuthorizedSuccess() {
         var resp = orderClient.createOrder(validIngredientIds, accessToken);
         asserts.assertOrderCreated(resp);
     }
 
     @Test
-    @Story("Создание заказа без авторизации")
-    public void createOrder_unauthorized_error() {
+    @DisplayName("Создать заказ без авторизации -> 200")
+    @Description("Позитив: передаём валидные ингредиенты без токена. Ожидаем 200 и номер заказа.")
+    public void createOrderUnauthorizedSuccess() {
         var resp = orderClient.createOrder(validIngredientIds, null);
         asserts.assertOrderUnauthorized(resp);
     }
 
     @Test
-    @Story("Создание заказа с ингредиентами (повторный позитивный сценарий)")
-    public void createOrder_withIngredients_again_success() {
+    @DisplayName("Повторное создание заказа с авторизацией")
+    @Description("Позитив: повторяем успешный сценарий с теми же валидными ингредиентами.")
+    public void createOrderWithIngredientsAgainSuccess() {
         var resp = orderClient.createOrder(validIngredientIds, accessToken);
         asserts.assertOrderCreated(resp);
     }
 
     @Test
-    @Story("Создание заказа без ингредиентов (с авторизацией)")
-    public void createOrder_noIngredients_error() {
+    @DisplayName("Создать заказ без ингредиентов -> 400")
+    @Description("Негатив: отправляем пустой список ингредиентов, но с токеном. Ожидаем 400 Bad Request.")
+    public void createOrderNoIngredientsError() {
         var resp = orderClient.createOrder(new ArrayList<>(), accessToken);
         asserts.assertOrderNoIngredients(resp);
     }
 
     @Test
-    @Story("Создание заказа с неверным хешем ингредиента (с авторизацией)")
-    public void createOrder_invalidIngredientHash_error() {
+    @DisplayName("Создать заказ с одним невалидным хэшем ингредиента -> 500")
+    @Description("Негатив: 1 из ингредиентов — рандомный id. Ожидаем 500")
+    public void createOrderInvalidIngredientHashError() {
         List<String> mixed = new ArrayList<>(validIngredientIds);
-        mixed.add(data.invalidIngredientId());
+        mixed.add(INVALID_HASH);
         var resp = orderClient.createOrder(mixed, accessToken);
         asserts.assertOrderInvalidIngredientHash(resp);
     }

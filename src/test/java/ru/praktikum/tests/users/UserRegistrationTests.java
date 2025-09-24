@@ -1,10 +1,7 @@
 package ru.praktikum.tests.users;
 
-import io.qameta.allure.Epic;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-import io.qameta.allure.Description;
-import io.qameta.allure.junit4.AllureJunit4;
+import io.qameta.allure.*;
+import io.qameta.allure.junit4.DisplayName;
 import org.junit.Before;
 import org.junit.Test;
 import ru.praktikum.base.BaseTest;
@@ -12,9 +9,6 @@ import ru.praktikum.clients.UserClient;
 import ru.praktikum.models.User;
 import ru.praktikum.utils.AssertionsHelper;
 import ru.praktikum.utils.DataFactory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Epic("Stellar Burgers API")
 @Feature("Users: Registration")
@@ -32,9 +26,9 @@ public class UserRegistrationTests extends BaseTest {
     }
 
     @Test
-    @Story("Создать уникального пользователя")
-    @Description("Позитивный сценарий: регистрация с валидными email/password/name")
-    public void registerUniqueUser_success() {
+    @DisplayName("Успешная регистрация уникального пользователя")
+    @Description("Позитив: валидные email/password/name -> 200 и токены")
+    public void registerUniqueUserSuccess() {
         User user = data.newUser();
 
         var resp = userClient.register(user);
@@ -46,9 +40,9 @@ public class UserRegistrationTests extends BaseTest {
     }
 
     @Test
-    @Story("Создать пользователя, который уже зарегистрирован")
-    @Description("Негативный сценарий: вторая регистрация с тем же email")
-    public void registerAlreadyExists_error() {
+    @DisplayName("Повторная регистрация с тем же email -> ошибка")
+    @Description("Негатив: дважды регистрируем одного и того же пользователя")
+    public void registerAlreadyExistsError() {
         User user = data.newUser();
 
         var first = userClient.register(user);
@@ -61,15 +55,31 @@ public class UserRegistrationTests extends BaseTest {
     }
 
     @Test
-    @Story("Создать пользователя без одного из обязательных полей")
-    @Description("Негативный сценарий: пропустить email")
-    public void registerMissingRequiredField_error_email() {
-        Map<String, Object> body = new HashMap<>(); // без email
-        body.put("password", data.validPassword());
-        body.put("name", data.validName());
+    @DisplayName("Регистрация без email -> ошибка")
+    @Description("Негатив: пропускаем email (email = null)")
+    public void registerMissingRequiredFieldErrorEmail() {
+        User withoutEmail = new User(null, data.validPassword(), data.validName());
+        var resp = userClient.register(withoutEmail);
+        asserts.assertMissingFieldsOnRegistration(resp);
+    }
 
-        var resp = userClient.registerRaw(body);
+    @Test
+    @DisplayName("Регистрация без имени -> ошибка")
+    @Description("Негатив: пропускаем имя (name = null)")
+    public void registerMissingRequiredFieldErrorName() {
+        User withoutName = new User(data.uniqueEmail(), data.validPassword(), null);
+        var resp = userClient.register(withoutName);
+        asserts.assertMissingFieldsOnRegistration(resp);
+    }
+
+    @Test
+    @DisplayName("Регистрация без пароля -> ошибка")
+    @Description("Негатив: пропускаем пароль (password = null)")
+    public void registerMissingRequiredFieldErrorPassword() {
+        User withoutPassword = new User(data.uniqueEmail(), null, data.validName());
+        var resp = userClient.register(withoutPassword);
         asserts.assertMissingFieldsOnRegistration(resp);
     }
 }
+
 

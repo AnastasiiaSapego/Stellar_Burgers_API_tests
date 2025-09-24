@@ -7,6 +7,8 @@ import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
+import static org.apache.http.HttpStatus.*;
+
 
 public class IngredientClient {
 
@@ -17,7 +19,7 @@ public class IngredientClient {
                 .get("/api/ingredients");
 
         resp.then()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .body("success", is(true));
 
         return resp.then().extract().path("data._id");

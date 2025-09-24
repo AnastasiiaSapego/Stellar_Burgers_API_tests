@@ -1,7 +1,7 @@
 package ru.praktikum.tests.users;
 
 import io.qameta.allure.*;
-import io.qameta.allure.junit4.AllureJunit4;
+import io.qameta.allure.junit4.DisplayName;
 import org.junit.Before;
 import org.junit.Test;
 import ru.praktikum.base.BaseTest;
@@ -34,24 +34,27 @@ public class UserLoginTests extends BaseTest {
     }
 
     @Test
-    @Story("Вход под существующим пользователем")
-    public void loginExistingUser_success() {
+    @DisplayName("Логин с валидными учётными данными")
+    @Description("Позитив: корректные email + password -> 200 и токены")
+    public void loginExistingUserSuccess() {
         var resp = userClient.login(new Credentials(
                 registeredUser.getEmail(), registeredUser.getPassword()));
         asserts.assertLoginSuccess(resp);
     }
 
     @Test
-    @Story("Вход с неверным паролем")
-    public void loginWrongPassword_error() {
+    @DisplayName("Логин c неверным паролем -> 401")
+    @Description("Негатив: правильный email, но изменённый пароль. Ожидаем 401 Unauthorized.")
+    public void loginWrongPasswordError() {
         var resp = userClient.login(new Credentials(
                 registeredUser.getEmail(), "wrong" + registeredUser.getPassword()));
         asserts.assertLoginUnauthorized(resp);
     }
 
     @Test
-    @Story("Вход с несуществующим email")
-    public void loginWrongEmail_error() {
+    @DisplayName("Логин c несуществующим email -> 401")
+    @Description("Негатив: случайный email, валидный пароль. Ожидаем 401 Unauthorized.")
+    public void loginWrongEmailError() {
         var resp = userClient.login(new Credentials(
                 data.uniqueEmail(), registeredUser.getPassword()));
         asserts.assertLoginUnauthorized(resp);

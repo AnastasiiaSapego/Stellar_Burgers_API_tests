@@ -5,6 +5,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import static io.restassured.RestAssured.given;
 
+import ru.praktikum.config.Endpoints;
 import ru.praktikum.config.TestConfig;
 import ru.praktikum.models.Credentials;
 import ru.praktikum.models.User;
@@ -20,7 +21,7 @@ public class UserClient {
                 .contentType(ContentType.JSON)
                 .body(user)
                 .when()
-                .post(TestConfig.REGISTER);
+                .post(Endpoints.REGISTER);
     }
 
     @Step("POST {TestConfig.REGISTER}: регистрация с произвольным телом")
@@ -30,7 +31,7 @@ public class UserClient {
                 .contentType(ContentType.JSON)
                 .body(body)
                 .when()
-                .post(TestConfig.REGISTER);
+                .post(Endpoints.REGISTER);
     }
 
     @Step("POST {TestConfig.LOGIN}: логин пользователя")
@@ -40,7 +41,7 @@ public class UserClient {
                 .contentType(ContentType.JSON)
                 .body(credentials)
                 .when()
-                .post(TestConfig.LOGIN);
+                .post(Endpoints.LOGIN);
     }
 
     @Step("DELETE {TestConfig.USER}: удалить пользователя (нужна Authorization)")
@@ -49,7 +50,7 @@ public class UserClient {
                 .spec(TestConfig.getBaseRequestSpec())
                 .header("Authorization", accessToken)
                 .when()
-                .delete(TestConfig.USER);
+                .delete(Endpoints.USER);
     }
 }
 

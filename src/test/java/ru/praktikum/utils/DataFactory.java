@@ -1,11 +1,8 @@
 package ru.praktikum.utils;
 
-import ru.praktikum.models.Credentials;
 import ru.praktikum.models.User;
 
 import java.security.SecureRandom;
-import java.util.Collection;
-import java.util.Random;
 
 public class DataFactory {
 
@@ -14,7 +11,6 @@ public class DataFactory {
     private static final String UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final String DIGITS = "0123456789";
     private static final String SYMBOLS = "!@#$%^&*";
-    private static final String HEX = "0123456789abcdef";
 
     private String randomFrom(String alphabet, int len) {
         StringBuilder sb = new StringBuilder(len);
@@ -59,23 +55,5 @@ public class DataFactory {
 
     public User newUser() {
         return new User(uniqueEmail(), validPassword(), validName());
-    }
-
-    public Credentials credentialsFrom(User user) {
-        return new Credentials(user.getEmail(), user.getPassword());
-    }
-
-    public String invalidIngredientId() {
-        return randomFrom(HEX, 24);
-    }
-
-    public String invalidIngredientId(Collection<String> validIds) {
-        String id;
-        int guard = 0;
-        do {
-            id = invalidIngredientId();
-            guard++;
-        } while (validIds != null && validIds.contains(id) && guard < 100);
-        return id;
     }
 }
