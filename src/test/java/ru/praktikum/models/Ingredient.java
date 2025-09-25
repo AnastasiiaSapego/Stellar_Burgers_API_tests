@@ -8,10 +8,10 @@ public class Ingredient {
     public Ingredient(String id) {
         this.id = id;
     }
-    public String get_id() {
+    public String getId() {
         return id;
     }
-    public void set_id(String id) {
+    public void setId(String id) {
         this.id = id;
     }
 }
